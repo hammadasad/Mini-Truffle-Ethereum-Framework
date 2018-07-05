@@ -7,6 +7,8 @@ const Web3 = require('web3');
 // provider is what we use to communicate between web3 and the ganache network
 const web3 = new Web3(ganache.provider());
 
+const { interface, bytecode } = require('../compile');
+
 // Mocha
 // it -> run a test and make assertion
 // describe -> group our 'it' functions together
@@ -16,16 +18,21 @@ const web3 = new Web3(ganache.provider());
 // Freely send and receive ether without concern of public / private keys
 
 let accounts;
+let inbox;
 
 beforeEach(async () => {
     // Get a list of all accounts
     accounts = await web3.eth.getAccounts();
     // Use one account to deploy contract
+    inbox = new web3.eth.Contract(JSON.parse(interface)) // Teaches web3 about what methods Inbox contract has
+        .deploy({ data : bytecode, arguments : ["Hi"] }) // Tells web3 that we want to deploy a new copy of this contract
+        .send({ from : accounts[0], gas : '1000000'}); // Instructs web3 to send out a transaction that creates this contract
+        
 });
 
 describe('Inbox', () => {
     it('deploys a contract', () => {
-        console.log(accounts);
+        console.log(inbox);
     });
 });
 
