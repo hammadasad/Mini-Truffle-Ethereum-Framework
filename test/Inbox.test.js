@@ -15,18 +15,17 @@ const web3 = new Web3(ganache.provider());
 // Web3 uses unlocked accounts / 100% accessible.
 // Freely send and receive ether without concern of public / private keys
 
-beforeEach(() => {
+let accounts;
+
+beforeEach(async () => {
     // Get a list of all accounts
-    const list = web3.eth.getAccounts()
-        .then(fetchedAccounts => {
-            console.log(fetchedAccounts);
-        });
+    accounts = await web3.eth.getAccounts();
     // Use one account to deploy contract
 });
 
 describe('Inbox', () => {
     it('deploys a contract', () => {
-        
+        console.log(accounts);
     });
 });
 
