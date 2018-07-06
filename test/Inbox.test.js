@@ -1,6 +1,8 @@
 const assert = require('assert');
 const ganache = require('ganache-cli');
 
+require('events').EventEmitter.prototype._maxListeners = 100;
+
 // Requiring a constructor function, hence capitalized
 const Web3 = require('web3');
 
@@ -23,20 +25,39 @@ let inbox;
 beforeEach(async () => {
     // Get a list of all accounts
     accounts = await web3.eth.getAccounts();
+
     // Use one account to deploy contract
-    inbox = new web3.eth.Contract(JSON.parse(interface)) // Teaches web3 about what methods Inbox contract has
+    inbox = await new web3.eth.Contract(JSON.parse(interface)) // Teaches web3 about what methods Inbox contract has
         .deploy({ data : bytecode, arguments : ["Hi"] }) // Tells web3 that we want to deploy a new copy of this contract
         .send({ from : accounts[0], gas : '1000000'}); // Instructs web3 to send out a transaction that creates this contract
-        
+
 });
 
 describe('Inbox', () => {
     it('deploys a contract', () => {
-        console.log(inbox);
+        assert.ok(inbox.options.address);
+    });
+
+    // Calling a default method like message, we make 2 calls
+    // message() -> Takes in the parameters to the method
+    // .call() or send() -> actually calls it/sends transaction to network, customizes the transaction too
+    // pass in who's going to make the transaction/pay and how much gas used
+    it('has a default message', async () => {
+        const message = await inbox.methods.message().call();
+        assert.equal(message, 'Hi');
+    });
+
+    // // inbox.methods is how we access our contract in general
+    it('can change the message', async () => {
+        await inbox.methods.setMessage("Bye").send(
+            {
+                from : accounts[0]
+            }
+        );
+        const message = await inbox.methods.message().call();
+        assert.equal(message, 'Bye');
     });
 });
-
-
 
 
 
