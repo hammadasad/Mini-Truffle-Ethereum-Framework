@@ -22,4 +22,4 @@ Compiling Structure:
 
 Deploying Structure:
 
-![](Deploy Structure.png?raw=true "")
+![](inbox/Deploy \Structure.png?raw=true "")
